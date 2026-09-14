@@ -9,6 +9,21 @@ function hostnameOf(url) {
   }
 }
 
+function groupBySection(links) {
+  const groups = {};
+  for (const link of links) {
+    const key = link.section || 'Ungrouped';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(link);
+  }
+  const keys = Object.keys(groups).sort((a, b) => {
+    if (a === 'Ungrouped') return 1;
+    if (b === 'Ungrouped') return -1;
+    return a.localeCompare(b);
+  });
+  return keys.map((key) => ({ section: key, links: groups[key] }));
+}
+
 export default function Project() {
   const router = useRouter();
   const { id } = router.query;
@@ -57,6 +72,8 @@ export default function Project() {
 
   if (!project) return <div className="container"><p className="muted">Loading…</p></div>;
 
+  const groups = groupBySection(project.links);
+
   return (
     <div className="container">
       <a href="/" className="back-link">← All projects</a>
@@ -72,45 +89,59 @@ export default function Project() {
         </div>
       </div>
 
-      <div className="link-grid">
-        {project.links.map((link) => (
-          <div key={link.id} className="link-card">
-            {link.image_url && <img src={link.image_url} alt="" />}
-            <h3>{link.title || link.url}</h3>
+      {project.links.length === 0 && (
+        <p className="muted">No links yet. Save one from the Chrome extension.</p>
+      )}
 
-            <div className="detail-row">
-              <input
-                className="detail-input"
-                placeholder="Color"
-                defaultValue={link.color || ''}
-                onBlur={(e) => saveDetail(link.id, 'color', e.target.value)}
-              />
-              <input
-                className="detail-input"
-                placeholder="Size"
-                defaultValue={link.size || ''}
-                onBlur={(e) => saveDetail(link.id, 'size', e.target.value)}
-              />
-            </div>
+      {groups.map((group) => (
+        <div key={group.section} className="section-group">
+          <h2 className="section-heading">
+            {group.section} <span className="muted">({group.links.length})</span>
+          </h2>
+          <div className="link-grid">
+            {group.links.map((link) => (
+              <div key={link.id} className="link-card">
+                {link.image_url && <img src={link.image_url} alt="" />}
+                <h3>{link.title || link.url}</h3>
 
-            <a href={link.url} target="_blank" rel="noreferrer" className="link-url" title={link.url}>
-              {hostnameOf(link.url)}
-            </a>
-            <div className="meta">
-              {link.image_width && link.image_height && (
-                <span>{link.image_width}×{link.image_height}px</span>
-              )}
-              {link.file_size_bytes && (
-                <span>{(link.file_size_bytes / 1024).toFixed(0)} KB</span>
-              )}
-            </div>
-            <button className="remove-btn" onClick={() => deleteLink(link.id)}>Remove</button>
+                <div className="detail-row">
+                  <input
+                    className="detail-input"
+                    placeholder="Section"
+                    defaultValue={link.section || ''}
+                    onBlur={(e) => saveDetail(link.id, 'section', e.target.value)}
+                  />
+                  <input
+                    className="detail-input"
+                    placeholder="Price"
+                    defaultValue={link.price || ''}
+                    onBlur={(e) => saveDetail(link.id, 'price', e.target.value)}
+                  />
+                </div>
+                <div className="detail-row">
+                  <input
+                    className="detail-input"
+                    placeholder="Color"
+                    defaultValue={link.color || ''}
+                    onBlur={(e) => saveDetail(link.id, 'color', e.target.value)}
+                  />
+                  <input
+                    className="detail-input"
+                    placeholder="Size"
+                    defaultValue={link.size || ''}
+                    onBlur={(e) => saveDetail(link.id, 'size', e.target.value)}
+                  />
+                </div>
+
+                <a href={link.url} target="_blank" rel="noreferrer" className="link-url" title={link.url}>
+                  {hostnameOf(link.url)}
+                </a>
+                <button className="remove-btn" onClick={() => deleteLink(link.id)}>Remove</button>
+              </div>
+            ))}
           </div>
-        ))}
-        {project.links.length === 0 && (
-          <p className="muted">No links yet. Save one from the Chrome extension.</p>
-        )}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }

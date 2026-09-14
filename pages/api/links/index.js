@@ -5,11 +5,10 @@ export default async function handler(req, res) {
   if (!isAuthed(req)) return res.status(401).json({ error: 'Unauthorized' });
 
   if (req.method === 'GET') {
-    // Used to fetch the "General Catalog" — links with no project assigned yet.
+    // General Catalog — every link across every project.
     const { data, error } = await supabase
       .from('links')
-      .select('*')
-      .is('project_id', null)
+      .select('*, projects(name)')
       .order('created_at', { ascending: false });
 
     if (error) return res.status(500).json({ error: error.message });
@@ -21,10 +20,11 @@ export default async function handler(req, res) {
       project_id,
       url,
       title,
+      section,
+      color,
+      size,
+      price,
       image_url,
-      image_width,
-      image_height,
-      file_size_bytes,
     } = req.body || {};
 
     if (!url) {
@@ -37,10 +37,11 @@ export default async function handler(req, res) {
         project_id: project_id || null,
         url,
         title: title || null,
+        section: section || null,
+        color: color || null,
+        size: size || null,
+        price: price || null,
         image_url: image_url || null,
-        image_width: image_width || null,
-        image_height: image_height || null,
-        file_size_bytes: file_size_bytes || null,
       })
       .select()
       .single();

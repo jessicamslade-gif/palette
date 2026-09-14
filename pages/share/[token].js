@@ -9,6 +9,21 @@ function hostnameOf(url) {
   }
 }
 
+function groupBySection(links) {
+  const groups = {};
+  for (const link of links) {
+    const key = link.section || 'Ungrouped';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(link);
+  }
+  const keys = Object.keys(groups).sort((a, b) => {
+    if (a === 'Ungrouped') return 1;
+    if (b === 'Ungrouped') return -1;
+    return a.localeCompare(b);
+  });
+  return keys.map((key) => ({ section: key, links: groups[key] }));
+}
+
 export default function SharedProject() {
   const router = useRouter();
   const { token } = router.query;
@@ -26,6 +41,8 @@ export default function SharedProject() {
   if (notFound) return <div className="container"><p className="muted">This catalog link isn't valid.</p></div>;
   if (!project) return <div className="container"><p className="muted">Loading…</p></div>;
 
+  const groups = groupBySection(project.links);
+
   return (
     <div className="container">
       <div className="project-header">
@@ -33,25 +50,31 @@ export default function SharedProject() {
         <a className="button" href={`/api/export-share/${token}`}>Export PDF</a>
       </div>
 
-      <div className="link-grid">
-        {project.links.map((link) => (
-          <div key={link.id} className="link-card">
-            {link.image_url && <img src={link.image_url} alt="" />}
-            <h3>{link.title || link.url}</h3>
-            {(link.color || link.size) && (
-              <div className="item-details">
-                {[link.color, link.size].filter(Boolean).join('  ·  ')}
+      {project.links.length === 0 && <p className="muted">No items in this catalog yet.</p>}
+
+      {groups.map((group) => (
+        <div key={group.section} className="section-group">
+          <h2 className="section-heading">
+            {group.section} <span className="muted">({group.links.length})</span>
+          </h2>
+          <div className="link-grid">
+            {group.links.map((link) => (
+              <div key={link.id} className="link-card">
+                {link.image_url && <img src={link.image_url} alt="" />}
+                <h3>{link.title || link.url}</h3>
+                {(link.color || link.size || link.price) && (
+                  <div className="item-details">
+                    {[link.color, link.size, link.price].filter(Boolean).join('  ·  ')}
+                  </div>
+                )}
+                <a href={link.url} target="_blank" rel="noreferrer" className="link-url" title={link.url}>
+                  {hostnameOf(link.url)}
+                </a>
               </div>
-            )}
-            <a href={link.url} target="_blank" rel="noreferrer" className="link-url" title={link.url}>
-              {hostnameOf(link.url)}
-            </a>
+            ))}
           </div>
-        ))}
-        {project.links.length === 0 && (
-          <p className="muted">No items in this catalog yet.</p>
-        )}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }

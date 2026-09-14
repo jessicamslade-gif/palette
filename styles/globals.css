@@ -83,6 +83,15 @@ h1 { font-size: 26px; margin: 0; }
 .detail-input:focus { outline: none; border-color: #ccc; background: #fff; }
 .detail-input::placeholder { color: #bbb; }
 .item-details { font-size: 12px; color: #666; margin: 2px 0; }
+.section-group { margin-bottom: 36px; }
+.section-heading {
+  font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+  color: #555; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid #eee;
+}
+.badge {
+  display: inline-block; font-size: 10px; font-weight: 600; color: #666; background: #f0f0f0;
+  padding: 2px 8px; border-radius: 10px; margin-bottom: 6px; align-self: flex-start;
+}
 .meta { font-size: 11px; color: #999; display: flex; gap: 10px; margin-top: 2px; }
 .remove-btn {
   margin-top: 8px; align-self: flex-start; background: none; border: none; color: #c0392b;

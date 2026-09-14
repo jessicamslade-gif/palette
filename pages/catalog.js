@@ -65,15 +65,30 @@ export default function GeneralCatalog() {
         <h1>General Catalog</h1>
       </div>
       <p className="muted" style={{ marginTop: -14, marginBottom: 24 }}>
-        Links saved without picking a project. Assign them to a project whenever you're ready.
+        Every item you've saved, across all projects.
       </p>
 
       <div className="link-grid">
         {links.map((link) => (
           <div key={link.id} className="link-card">
             {link.image_url && <img src={link.image_url} alt="" />}
+            {link.projects?.name && <div className="badge">{link.projects.name}</div>}
             <h3>{link.title || link.url}</h3>
 
+            <div className="detail-row">
+              <input
+                className="detail-input"
+                placeholder="Section"
+                defaultValue={link.section || ''}
+                onBlur={(e) => saveDetail(link.id, 'section', e.target.value)}
+              />
+              <input
+                className="detail-input"
+                placeholder="Price"
+                defaultValue={link.price || ''}
+                onBlur={(e) => saveDetail(link.id, 'price', e.target.value)}
+              />
+            </div>
             <div className="detail-row">
               <input
                 className="detail-input"
@@ -92,14 +107,6 @@ export default function GeneralCatalog() {
             <a href={link.url} target="_blank" rel="noreferrer" className="link-url" title={link.url}>
               {hostnameOf(link.url)}
             </a>
-            <div className="meta">
-              {link.image_width && link.image_height && (
-                <span>{link.image_width}×{link.image_height}px</span>
-              )}
-              {link.file_size_bytes && (
-                <span>{(link.file_size_bytes / 1024).toFixed(0)} KB</span>
-              )}
-            </div>
 
             <select
               defaultValue=""
@@ -117,7 +124,7 @@ export default function GeneralCatalog() {
           </div>
         ))}
         {links.length === 0 && (
-          <p className="muted">Nothing here yet. Save a link from the extension without picking a project to see it here.</p>
+          <p className="muted">Nothing saved yet.</p>
         )}
       </div>
     </div>
