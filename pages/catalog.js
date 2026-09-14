@@ -8,10 +8,69 @@ function hostnameOf(url) {
   }
 }
 
+function AssignControl({ link, projects, apiUrl, onAssigned }) {
+  const [projectId, setProjectId] = useState('');
+  const [section, setSection] = useState('');
+  const [sections, setSections] = useState([]);
+  const [saving, setSaving] = useState(false);
+
+  async function handleProjectChange(e) {
+    const pid = e.target.value;
+    setProjectId(pid);
+    setSection('');
+    setSections([]);
+    if (!pid) return;
+    const res = await fetch(`/api/projects/${pid}`);
+    if (res.ok) {
+      const project = await res.json();
+      const uniqueSections = [...new Set((project.links || []).map((l) => l.section).filter(Boolean))];
+      setSections(uniqueSections);
+    }
+  }
+
+  async function handleAssign() {
+    if (!projectId) return;
+    setSaving(true);
+    await fetch(`/api/links/${link.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ project_id: projectId, section: section || null }),
+    });
+    setSaving(false);
+    onAssigned();
+  }
+
+  return (
+    <div className="assign-control">
+      <select value={projectId} onChange={handleProjectChange}>
+        <option value="">Add to project…</option>
+        {projects.map((p) => (
+          <option key={p.id} value={p.id}>{p.name}</option>
+        ))}
+      </select>
+      {projectId && (
+        <>
+          <input
+            list={`sections-${link.id}`}
+            placeholder="Section (optional)"
+            value={section}
+            onChange={(e) => setSection(e.target.value)}
+          />
+          <datalist id={`sections-${link.id}`}>
+            {sections.map((s) => <option key={s} value={s} />)}
+          </datalist>
+          <button className="button-ghost" disabled={saving} onClick={handleAssign}>
+            {saving ? 'Adding…' : 'Add'}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function GeneralCatalog() {
   const [links, setLinks] = useState(null);
   const [projects, setProjects] = useState([]);
-  const [movingId, setMovingId] = useState(null);
 
   async function load() {
     const [linksRes, projectsRes] = await Promise.all([
@@ -29,18 +88,6 @@ export default function GeneralCatalog() {
   useEffect(() => {
     load();
   }, []);
-
-  async function moveToProject(linkId, projectId) {
-    if (!projectId) return;
-    setMovingId(linkId);
-    await fetch(`/api/links/${linkId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ project_id: projectId }),
-    });
-    setMovingId(null);
-    load();
-  }
 
   async function deleteLink(linkId) {
     await fetch(`/api/links/${linkId}`, { method: 'DELETE' });
@@ -108,17 +155,7 @@ export default function GeneralCatalog() {
               {hostnameOf(link.url)}
             </a>
 
-            <select
-              defaultValue=""
-              disabled={movingId === link.id}
-              onChange={(e) => moveToProject(link.id, e.target.value)}
-              style={{ marginTop: 10 }}
-            >
-              <option value="" disabled>Move to project…</option>
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
+            <AssignControl link={link} projects={projects} onAssigned={load} />
 
             <button className="remove-btn" onClick={() => deleteLink(link.id)}>Remove</button>
           </div>
