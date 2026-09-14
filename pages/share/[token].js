@@ -47,10 +47,10 @@ export default function SharedProject() {
     <div>
       <div className="brand-header">
         <img src="/logo-white.png" alt="" className="brand-logo" />
+        <h1 className="brand-title">{project.name}</h1>
       </div>
       <div className="container">
-        <div className="project-header">
-          <h1>{project.name}</h1>
+        <div className="share-toolbar">
           <a className="button" href={`/api/export-share/${token}`}>Export PDF</a>
         </div>
 

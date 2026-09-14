@@ -98,9 +98,11 @@ h1 { font-size: 26px; margin: 0; }
 }
 .assign-control button { font-size: 12px; padding: 6px; }
 .brand-header {
-  background: #1c1c1c; padding: 16px 24px; display: flex; align-items: center;
+  background: #1c1c1c; padding: 14px 24px; display: flex; align-items: center; gap: 16px;
 }
-.brand-logo { height: 36px; width: auto; }
+.brand-logo { height: 34px; width: auto; }
+.brand-title { color: #fff; font-size: 20px; margin: 0; }
+.share-toolbar { display: flex; justify-content: flex-end; margin: 24px 0 20px; }
 .meta { font-size: 11px; color: #999; display: flex; gap: 10px; margin-top: 2px; }
 .remove-btn {
   margin-top: 8px; align-self: flex-start; background: none; border: none; color: #c0392b;
