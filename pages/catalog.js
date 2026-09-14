@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
 
+function hostnameOf(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
+
 export default function GeneralCatalog() {
   const [links, setLinks] = useState(null);
   const [projects, setProjects] = useState([]);
@@ -39,6 +47,14 @@ export default function GeneralCatalog() {
     load();
   }
 
+  async function saveDetail(linkId, field, value) {
+    await fetch(`/api/links/${linkId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [field]: value }),
+    });
+  }
+
   if (!links) return <div className="container"><p className="muted">Loading…</p></div>;
 
   return (
@@ -57,8 +73,24 @@ export default function GeneralCatalog() {
           <div key={link.id} className="link-card">
             {link.image_url && <img src={link.image_url} alt="" />}
             <h3>{link.title || link.url}</h3>
-            <a href={link.url} target="_blank" rel="noreferrer" className="link-url">
-              {link.url}
+
+            <div className="detail-row">
+              <input
+                className="detail-input"
+                placeholder="Color"
+                defaultValue={link.color || ''}
+                onBlur={(e) => saveDetail(link.id, 'color', e.target.value)}
+              />
+              <input
+                className="detail-input"
+                placeholder="Size"
+                defaultValue={link.size || ''}
+                onBlur={(e) => saveDetail(link.id, 'size', e.target.value)}
+              />
+            </div>
+
+            <a href={link.url} target="_blank" rel="noreferrer" className="link-url" title={link.url}>
+              {hostnameOf(link.url)}
             </a>
             <div className="meta">
               {link.image_width && link.image_height && (

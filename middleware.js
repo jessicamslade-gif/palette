@@ -5,6 +5,7 @@ export function middleware(req) {
 
   if (
     pathname.startsWith('/login') ||
+    pathname.startsWith('/share') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname === '/favicon.ico'

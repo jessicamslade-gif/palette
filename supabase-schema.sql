@@ -5,6 +5,7 @@ create extension if not exists pgcrypto;
 create table if not exists projects (
   id uuid primary key default gen_random_uuid(),
   name text not null,
+  share_token uuid not null default gen_random_uuid(),
   created_at timestamptz not null default now()
 );
 
@@ -13,6 +14,8 @@ create table if not exists links (
   project_id uuid references projects(id) on delete cascade,
   url text not null,
   title text,
+  color text,
+  size text,
   image_url text,
   image_width int,
   image_height int,
@@ -20,4 +23,5 @@ create table if not exists links (
   created_at timestamptz not null default now()
 );
 
+create unique index if not exists projects_share_token_idx on projects(share_token);
 create index if not exists links_project_id_idx on links(project_id);

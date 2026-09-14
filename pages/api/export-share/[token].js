@@ -1,6 +1,7 @@
 import { supabase } from '../../../lib/supabase';
-import { isAuthed } from '../../../lib/auth';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+
+// Public route — no auth required, reachable via a project's share link.
 
 const PAGE_WIDTH = 612;
 const PAGE_HEIGHT = 792;
@@ -9,21 +10,19 @@ const IMG_BOX = 160;
 const BLOCK_HEIGHT = 190;
 
 export default async function handler(req, res) {
-  if (!isAuthed(req)) return res.status(401).json({ error: 'Unauthorized' });
-
-  const { id } = req.query;
+  const { token } = req.query;
 
   const { data: project, error: pErr } = await supabase
     .from('projects')
     .select('*')
-    .eq('id', id)
+    .eq('share_token', token)
     .single();
-  if (pErr) return res.status(404).json({ error: 'Project not found' });
+  if (pErr) return res.status(404).json({ error: 'Not found' });
 
   const { data: links, error: lErr } = await supabase
     .from('links')
     .select('*')
-    .eq('project_id', id)
+    .eq('project_id', project.id)
     .order('created_at', { ascending: true });
   if (lErr) return res.status(500).json({ error: lErr.message });
 
@@ -112,7 +111,6 @@ export default async function handler(req, res) {
       page.drawText(metaBits.join('   \u00b7   '), { x: textX, y: textY, size: 9, font, color: rgb(0.55, 0.55, 0.55) });
     }
 
-    // divider line
     page.drawLine({
       start: { x: MARGIN, y: y - BLOCK_HEIGHT + 15 },
       end: { x: PAGE_WIDTH - MARGIN, y: y - BLOCK_HEIGHT + 15 },

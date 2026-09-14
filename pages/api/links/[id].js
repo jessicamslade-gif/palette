@@ -12,11 +12,16 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PATCH') {
-    // Used to move a link from the General Catalog into a project (or back out).
-    const { project_id } = req.body || {};
+    // Used to move a link between projects/General Catalog, and to edit color/size.
+    const { project_id, color, size } = req.body || {};
+    const update = {};
+    if (project_id !== undefined) update.project_id = project_id || null;
+    if (color !== undefined) update.color = color || null;
+    if (size !== undefined) update.size = size || null;
+
     const { data, error } = await supabase
       .from('links')
-      .update({ project_id: project_id || null })
+      .update(update)
       .eq('id', id)
       .select()
       .single();
