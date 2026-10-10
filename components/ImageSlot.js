@@ -45,13 +45,35 @@ export default function ImageSlot({ link, onChanged, readOnly = false }) {
     setUploading(false);
   }
 
+  const picker = !readOnly && (
+    <input
+      ref={inputRef}
+      type="file"
+      accept="image/*"
+      style={{ display: 'none' }}
+      onChange={handleFile}
+    />
+  );
+
   if (link.image_url && !failed) {
     return (
-      <img
-        src={link.image_url}
-        alt=""
-        onError={() => setFailed(true)}
-      />
+      <>
+        <img src={link.image_url} alt="" onError={() => setFailed(true)} />
+        {!readOnly && (
+          <div className="image-replace-row">
+            <button
+              type="button"
+              className="image-replace-btn"
+              disabled={uploading}
+              onClick={() => inputRef.current?.click()}
+            >
+              {uploading ? 'Uploading…' : 'Replace image'}
+            </button>
+            {error && <span className="image-error">{error}</span>}
+            {picker}
+          </div>
+        )}
+      </>
     );
   }
 
@@ -68,13 +90,7 @@ export default function ImageSlot({ link, onChanged, readOnly = false }) {
           >
             {uploading ? 'Uploading…' : 'Upload image'}
           </button>
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleFile}
-          />
+          {picker}
           {error && <span className="image-error">{error}</span>}
         </>
       )}
