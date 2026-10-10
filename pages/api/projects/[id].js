@@ -25,6 +25,20 @@ export default async function handler(req, res) {
     return res.status(200).json({ ...project, links });
   }
 
+  if (req.method === 'PATCH') {
+    const { notes } = req.body || {};
+    const update = {};
+    if (notes !== undefined) update.notes = notes || null;
+    const { data, error } = await supabase
+      .from('projects')
+      .update(update)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json(data);
+  }
+
   if (req.method === 'DELETE') {
     const { error } = await supabase.from('projects').delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });

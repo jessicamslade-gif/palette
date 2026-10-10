@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import ImageSlot from '../components/ImageSlot';
 
 function hostnameOf(url) {
   try {
@@ -118,7 +119,7 @@ export default function GeneralCatalog() {
       <div className="link-grid">
         {links.map((link) => (
           <div key={link.id} className="link-card">
-            {link.image_url && <img src={link.image_url} alt="" />}
+            <ImageSlot link={link} onChanged={load} />
             {link.projects?.name && <div className="badge">{link.projects.name}</div>}
             <h3>{link.title || link.url}</h3>
 

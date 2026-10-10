@@ -12,13 +12,14 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PATCH') {
-    const { project_id, section, color, size, price } = req.body || {};
+    const { project_id, section, color, size, price, notes } = req.body || {};
     const update = {};
     if (project_id !== undefined) update.project_id = project_id || null;
     if (section !== undefined) update.section = section || null;
     if (color !== undefined) update.color = color || null;
     if (size !== undefined) update.size = size || null;
     if (price !== undefined) update.price = price || null;
+    if (notes !== undefined) update.notes = notes || null;
 
     const { data, error } = await supabase
       .from('links')

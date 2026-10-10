@@ -2,6 +2,8 @@ import { supabase } from '../../../lib/supabase';
 import { isAuthed } from '../../../lib/auth';
 import { buildCatalogPdf } from '../../../lib/pdf';
 
+export const config = { maxDuration: 30 };
+
 export default async function handler(req, res) {
   if (!isAuthed(req)) return res.status(401).json({ error: 'Unauthorized' });
 

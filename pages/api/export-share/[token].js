@@ -2,6 +2,8 @@ import { supabase } from '../../../lib/supabase';
 import { buildCatalogPdf } from '../../../lib/pdf';
 
 // Public route — no auth required, reachable via a project's share link.
+export const config = { maxDuration: 30 };
+
 export default async function handler(req, res) {
   const { token } = req.query;
 

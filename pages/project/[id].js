@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import ImageSlot from '../../components/ImageSlot';
 
 function hostnameOf(url) {
   try {
@@ -63,6 +64,14 @@ export default function Project() {
     });
   }
 
+  async function saveProjectNotes(value) {
+    await fetch(`/api/projects/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: value }),
+    });
+  }
+
   function copyShareLink() {
     const url = `${window.location.origin}/share/${project.share_token}`;
     navigator.clipboard.writeText(url);
@@ -89,6 +98,17 @@ export default function Project() {
         </div>
       </div>
 
+      <div className="notes-box">
+        <label className="notes-label">Note for your client (shown at the top of the share link and PDF)</label>
+        <textarea
+          className="notes-input"
+          rows={3}
+          placeholder="e.g. Here are my top picks for the living room. Let me know which you love!"
+          defaultValue={project.notes || ''}
+          onBlur={(e) => saveProjectNotes(e.target.value)}
+        />
+      </div>
+
       {project.links.length === 0 && (
         <p className="muted">No links yet. Save one from the Chrome extension.</p>
       )}
@@ -101,7 +121,7 @@ export default function Project() {
           <div className="link-grid">
             {group.links.map((link) => (
               <div key={link.id} className="link-card">
-                {link.image_url && <img src={link.image_url} alt="" />}
+                <ImageSlot link={link} onChanged={load} />
                 <h3>{link.title || link.url}</h3>
 
                 <div className="detail-row">
@@ -132,6 +152,14 @@ export default function Project() {
                     onBlur={(e) => saveDetail(link.id, 'size', e.target.value)}
                   />
                 </div>
+
+                <textarea
+                  className="notes-input item-notes-input"
+                  rows={2}
+                  placeholder="Note for client (optional)"
+                  defaultValue={link.notes || ''}
+                  onBlur={(e) => saveDetail(link.id, 'notes', e.target.value)}
+                />
 
                 <a href={link.url} target="_blank" rel="noreferrer" className="link-url" title={link.url}>
                   {hostnameOf(link.url)}

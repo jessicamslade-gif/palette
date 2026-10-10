@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import ImageSlot from '../../components/ImageSlot';
 
 function hostnameOf(url) {
   try {
@@ -54,6 +55,8 @@ export default function SharedProject() {
           <a className="button" href={`/api/export-share/${token}`}>Export PDF</a>
         </div>
 
+        {project.notes && <div className="client-note">{project.notes}</div>}
+
         {project.links.length === 0 && <p className="muted">No items in this catalog yet.</p>}
 
         {groups.map((group) => (
@@ -64,13 +67,14 @@ export default function SharedProject() {
             <div className="link-grid">
               {group.links.map((link) => (
                 <div key={link.id} className="link-card">
-                  {link.image_url && <img src={link.image_url} alt="" />}
+                  <ImageSlot link={link} readOnly />
                   <h3>{link.title || link.url}</h3>
                   {(link.color || link.size || link.price) && (
                     <div className="item-details">
                       {[link.color, link.size, link.price].filter(Boolean).join('  ·  ')}
                     </div>
                   )}
+                  {link.notes && <div className="item-note">{link.notes}</div>}
                   <a href={link.url} target="_blank" rel="noreferrer" className="link-url" title={link.url}>
                     {hostnameOf(link.url)}
                   </a>
