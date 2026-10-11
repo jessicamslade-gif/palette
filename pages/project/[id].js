@@ -51,7 +51,7 @@ export default function Project() {
     await fetch(`/api/links/${linkId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ project_id: null, section: null }),
+      body: JSON.stringify({ project_id: null }),
     });
     load();
   }

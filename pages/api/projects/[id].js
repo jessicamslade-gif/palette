@@ -41,7 +41,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'DELETE') {
     // Keep the items: move them back to the general catalog first.
-    await supabase.from('links').update({ project_id: null, section: null }).eq('project_id', id);
+    await supabase.from('links').update({ project_id: null }).eq('project_id', id);
     const { error } = await supabase.from('projects').delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ ok: true });

@@ -9,6 +9,21 @@ function hostnameOf(url) {
   }
 }
 
+function groupBySection(links) {
+  const groups = {};
+  for (const link of links) {
+    const key = link.section || 'No section';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(link);
+  }
+  const keys = Object.keys(groups).sort((a, b) => {
+    if (a === 'No section') return 1;
+    if (b === 'No section') return -1;
+    return a.localeCompare(b);
+  });
+  return keys.map((key) => ({ section: key, links: groups[key] }));
+}
+
 function AssignControl({ link, projects, apiUrl, onAssigned }) {
   const [projectId, setProjectId] = useState('');
   const [section, setSection] = useState('');
@@ -117,8 +132,13 @@ export default function GeneralCatalog() {
         Every item you've saved, across all projects.
       </p>
 
-      <div className="link-grid">
-        {links.map((link) => (
+      {groupBySection(links).map((group) => (
+        <div key={group.section} className="section-group">
+          <h2 className="section-heading">
+            {group.section} <span className="muted">({group.links.length})</span>
+          </h2>
+          <div className="link-grid">
+        {group.links.map((link) => (
           <div key={link.id} className="link-card">
             <ImageSlot link={link} onChanged={load} />
             {link.projects?.name && <div className="badge">{link.projects.name}</div>}
@@ -162,6 +182,10 @@ export default function GeneralCatalog() {
             <button className="remove-btn" onClick={() => deleteLink(link.id)}>Delete permanently</button>
           </div>
         ))}
+          </div>
+        </div>
+      ))}
+      <div className="link-grid">
         {links.length === 0 && (
           <p className="muted">Nothing saved yet.</p>
         )}
