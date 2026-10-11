@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import ImageSlot from '../../components/ImageSlot';
+import { sumPrices } from '../../lib/price';
 
 function hostnameOf(url) {
   try {
@@ -45,13 +46,18 @@ export default function Project() {
     load();
   }, [id]);
 
-  async function deleteLink(linkId) {
-    await fetch(`/api/links/${linkId}`, { method: 'DELETE' });
+  // Takes the item out of this project but keeps it in the General Catalog.
+  async function removeFromProject(linkId) {
+    await fetch(`/api/links/${linkId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ project_id: null, section: null }),
+    });
     load();
   }
 
   async function deleteProject() {
-    if (!confirm(`Delete "${project.name}" and all its links?`)) return;
+    if (!confirm(`Delete the project "${project.name}"? Its items will stay in the General Catalog.`)) return;
     await fetch(`/api/projects/${id}`, { method: 'DELETE' });
     router.push('/');
   }
@@ -82,6 +88,7 @@ export default function Project() {
   if (!project) return <div className="container"><p className="muted">Loading…</p></div>;
 
   const groups = groupBySection(project.links);
+  const totals = sumPrices(project.links);
 
   return (
     <div className="container">
@@ -164,12 +171,24 @@ export default function Project() {
                 <a href={link.url} target="_blank" rel="noreferrer" className="link-url" title={link.url}>
                   {hostnameOf(link.url)}
                 </a>
-                <button className="remove-btn" onClick={() => deleteLink(link.id)}>Remove</button>
+                <button className="remove-btn" onClick={() => removeFromProject(link.id)}>Remove from project</button>
               </div>
             ))}
           </div>
         </div>
       ))}
+
+      {project.links.length > 0 && (
+        <div className="total-box">
+          <span className="total-label">Total</span>
+          <span className="total-amount">{totals.text}</span>
+          {totals.skipped > 0 && (
+            <span className="total-note">
+              {totals.skipped} item{totals.skipped === 1 ? '' : 's'} without a price not included
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

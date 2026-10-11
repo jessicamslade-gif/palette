@@ -91,6 +91,7 @@ export default function GeneralCatalog() {
   }, []);
 
   async function deleteLink(linkId) {
+    if (!confirm('Permanently delete this item from your catalog?')) return;
     await fetch(`/api/links/${linkId}`, { method: 'DELETE' });
     load();
   }
@@ -158,7 +159,7 @@ export default function GeneralCatalog() {
 
             <AssignControl link={link} projects={projects} onAssigned={load} />
 
-            <button className="remove-btn" onClick={() => deleteLink(link.id)}>Remove</button>
+            <button className="remove-btn" onClick={() => deleteLink(link.id)}>Delete permanently</button>
           </div>
         ))}
         {links.length === 0 && (

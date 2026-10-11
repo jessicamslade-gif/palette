@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import ImageSlot from '../../components/ImageSlot';
+import { sumPrices } from '../../lib/price';
 
 function hostnameOf(url) {
   try {
@@ -43,6 +44,7 @@ export default function SharedProject() {
   if (!project) return <div className="container"><p className="muted">Loading…</p></div>;
 
   const groups = groupBySection(project.links);
+  const totals = sumPrices(project.links);
 
   return (
     <div>
@@ -83,6 +85,13 @@ export default function SharedProject() {
             </div>
           </div>
         ))}
+
+        {project.links.length > 0 && totals.counted > 0 && (
+          <div className="total-box">
+            <span className="total-label">Total</span>
+            <span className="total-amount">{totals.text}</span>
+          </div>
+        )}
       </div>
     </div>
   );

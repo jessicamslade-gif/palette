@@ -145,3 +145,12 @@ h1 { font-size: 26px; margin: 0; }
 }
 .image-replace-btn:hover { color: #1c1c1c; }
 .image-replace-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Project total */
+.total-box {
+  margin-top: 32px; padding: 16px 18px; border-top: 2px solid #1c1c1c;
+  display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+}
+.total-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #555; }
+.total-amount { font-size: 24px; font-weight: 700; }
+.total-note { font-size: 12px; color: #888; }
